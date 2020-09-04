@@ -1,0 +1,297 @@
+[gd_resource type="ShaderMaterial" load_steps=29 format=2]
+
+[ext_resource path="res://textures/splatmap_corrected_with_alpha.png" type="Texture" id=1]
+[ext_resource path="res://textures/Ground022_2K-JPG/Ground022_2K_AmbientOcclusion.jpg" type="Texture" id=2]
+[ext_resource path="res://textures/mosy Ground/tl2oebkr_2K_Bump.jpg" type="Texture" id=3]
+[ext_resource path="res://textures/Ground022_2K-JPG/Ground022_2K_Normal.jpg" type="Texture" id=4]
+[ext_resource path="res://textures/Ground022_2K-JPG/Ground022_2K_Color.jpg" type="Texture" id=5]
+[ext_resource path="res://textures/Ground022_2K-JPG/Ground022_2K_Displacement.jpg" type="Texture" id=6]
+[ext_resource path="res://textures/Ground022_2K-JPG/Ground022_2K_Roughness.jpg" type="Texture" id=7]
+[ext_resource path="res://textures/Blue/uewhcbakw_2K_Normal.jpg" type="Texture" id=8]
+[ext_resource path="res://textures/Blue/uewhcbakw_2K_Albedo.jpg" type="Texture" id=9]
+[ext_resource path="res://textures/Cracked Mud/Cracked_Mud_001_OCC.jpg" type="Texture" id=10]
+[ext_resource path="res://textures/Blue/uewhcbakw_2K_Roughness.jpg" type="Texture" id=11]
+[ext_resource path="res://textures/Blue/uewhcbakw_2K_Bump.jpg" type="Texture" id=12]
+[ext_resource path="res://textures/Cracked Mud/Cracked_Mud_001_COLOR.jpg" type="Texture" id=13]
+[ext_resource path="res://textures/Cracked Mud/Cracked_Mud_001_NORM.jpg" type="Texture" id=14]
+[ext_resource path="res://textures/Cracked Mud/Cracked_Mud_001_ROUGH.jpg" type="Texture" id=15]
+[ext_resource path="res://textures/Cracked Mud/Cracked_Mud_001_DISP.png" type="Texture" id=16]
+[ext_resource path="res://textures/Ground037_2K-JPG/Ground037_2K_Color.jpg" type="Texture" id=17]
+[ext_resource path="res://textures/Sponge002_2K-JPG/Sponge002_2K_Color.jpg" type="Texture" id=18]
+[ext_resource path="res://textures/sybsplatmap multiplier.png" type="Texture" id=19]
+[ext_resource path="res://textures/brown_mud_leaves_01_2k_jpg/brown_mud_leaves_01_AO_2k.jpg" type="Texture" id=20]
+[ext_resource path="res://textures/brown_mud_leaves_01_2k_jpg/brown_mud_leaves_01_Nor_2k.jpg" type="Texture" id=21]
+[ext_resource path="res://textures/aerial_grass_rock_2k_jpg(1)/aerial_grass_rock_diff_2k.jpg" type="Texture" id=22]
+[ext_resource path="res://textures/brown_mud_leaves_01_2k_jpg/brown_mud_leaves_01_diff_2k.jpg" type="Texture" id=23]
+[ext_resource path="res://textures/Ground037_2K-JPG/Ground037_2K_Normal.jpg" type="Texture" id=24]
+[ext_resource path="res://textures/aerial_grass_rock_2k_jpg(1)/aerial_grass_rock_nor_2k.jpg" type="Texture" id=25]
+[ext_resource path="res://textures/Sponge002_2K-JPG/Sponge002_2K_Normal.jpg" type="Texture" id=26]
+[ext_resource path="res://textures/brown_mud_leaves_01_2k_jpg/brown_mud_leaves_01_rough_2k.jpg" type="Texture" id=27]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type spatial;
+render_mode blend_mix, diffuse_lambert;
+
+uniform sampler2D splatmap : hint_albedo;
+
+uniform sampler2D sub_splatmap : hint_albedo;
+uniform sampler2D sub_red_tex:hint_albedo;
+uniform sampler2D sub_red_norm;
+uniform sampler2D sub_green_tex:hint_albedo;
+uniform sampler2D sub_green_norm;
+uniform sampler2D sub_blue_tex: hint_albedo;
+uniform sampler2D sub_blue_norm;
+
+uniform vec4 alpha_overlay : hint_color;
+uniform vec4 alpha_roghness_overlay : hint_color;
+uniform vec4 alpha_overlay_color : hint_color;
+
+uniform sampler2D redAO;
+uniform sampler2D redtex : hint_albedo;
+uniform sampler2D rednorm : hint_normal;
+uniform sampler2D redrough ;
+uniform sampler2D redbump;
+
+uniform sampler2D greenAO;
+uniform sampler2D greentex : hint_albedo;
+uniform sampler2D greennorm : hint_normal;
+uniform sampler2D greenrough;
+uniform sampler2D greenbump;
+
+uniform sampler2D blueAO;
+uniform sampler2D bluetex : hint_albedo;
+uniform sampler2D bluenorm : hint_normal;
+uniform sampler2D bluerough;
+uniform sampler2D bluebump;
+
+uniform sampler2D alphaAO;
+uniform sampler2D alphatex : hint_albedo;
+uniform sampler2D alphanorm : hint_normal;
+uniform sampler2D alpharough;
+uniform sampler2D alphabump;
+
+//uniform sampler2D alpha : hint_albedo;
+
+uniform float redRoughnessValue : hint_range(0,1);
+uniform float greenRoughnessValue : hint_range(0,1);
+uniform float blueRoughnessValue : hint_range(0,1);
+uniform float alphaRoughnessValue : hint_range(0,1);
+
+uniform float redBumpValue : hint_range(0,1);
+uniform float greenBumpValue : hint_range(0,1);
+uniform float blueBumpValue : hint_range(0,1);
+uniform float alphaBumpValue : hint_range(0,1);
+
+uniform float AOLEvalue : hint_range(0,1);
+uniform float AmbiontOccolutionLight : hint_range(0,1);
+uniform float AmbiontOccolution : hint_range(0,1);
+uniform float redres = 1;
+uniform float greenres = 1;
+uniform float blueres = 1;
+uniform float alphares = 1;
+uniform float sub_tex_res = 1;
+uniform float sub_bump : hint_range(0,1);
+//uniform float alphares = 1;
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+	
+	vec3 redaocolor;
+	vec3 redcolor;
+	vec3 rednormal;
+	vec3 redroughness;
+	
+	vec3 greenaocolor;
+	vec3 greencolor;
+	vec3 greennormal;
+	vec3 greenroughness;
+	
+	vec3 blueaocolor;
+	vec3 bluecolor;
+	vec3 bluenormal;
+	vec3 blueroughness;
+	
+	vec3 alphaaocolor;
+	//vec3 alphaaocolormultiplierfactor;
+	vec3 alphacolor;
+	vec3 alphanormal;
+	vec3 alpharoughness;
+	
+	//vec3 alphacolor;
+	vec4 splatmapcolor;
+	vec3 splatmapcolor_detailed;
+	vec3 sub_splatmap_color;
+	
+	vec3 bumprangered = texture(redbump,UV*redres).rgb*splatmapcolor.r;
+	vec3 bumprangegreen = texture(greenbump,UV*greenres).rgb*splatmapcolor.g;
+	vec3 bumprangeblue = texture(bluebump,UV*blueres).rgb*splatmapcolor.b;
+	vec3 bumprangealpha = texture(alphabump,UV*alphares).rgb*splatmapcolor.a;
+	
+	
+	splatmapcolor = texture(splatmap,UV).rgba;
+	
+	sub_splatmap_color = texture(sub_splatmap,UV).rgb;
+	
+	
+	
+	vec3 alphamap = vec3(1,1,1)-splatmapcolor.a;
+	
+	
+	vec3 bumpmap;
+	vec3 bumpmapred;
+	vec3 bumpmapgreen;
+	vec3 bumpmapblue;
+	vec3 bumpmapalpha;
+	
+	float bumpredvalue = bumprangered.r + bumprangered.g + bumprangered.b;
+	float bumpgreenvalue = bumprangegreen.r + bumprangegreen.g + bumprangegreen.b;
+	float bumpbluevalue = bumprangeblue.r + bumprangeblue.g + bumprangegreen.b;
+	float bumpalphavalue = bumprangealpha.r + bumprangealpha.g + bumprangealpha.b;
+	//bumpmap = (bumprangered+bumprangegreen+bumprangeblue)*bumpvalue;
+	float totalbumpvalue = bumpalphavalue + bumpredvalue + bumpgreenvalue + bumpbluevalue;
+	
+	float i= 0.0;
+	while (i<totalbumpvalue) {
+		if (bumpredvalue > bumpgreenvalue && bumpredvalue > bumpbluevalue && bumpalphavalue < bumpredvalue ) {
+			bumpmapred = bumprangered*splatmapcolor.r;
+		}
+		if (bumpgreenvalue > bumpredvalue && bumpgreenvalue > bumpbluevalue && bumpgreenvalue > bumpalphavalue) {
+			bumpmapgreen = bumprangered*splatmapcolor.g;
+		}
+		if (bumpbluevalue > bumpredvalue && bumpbluevalue > bumpgreenvalue && bumpbluevalue > bumpalphavalue) {
+			bumpmapblue = bumprangeblue*splatmapcolor.b;
+		}
+		if (bumpalphavalue > bumpredvalue && bumpalphavalue > bumpgreenvalue && bumpalphavalue > bumpbluevalue) {
+			bumpmapalpha = bumprangealpha * alphamap;
+		}
+		
+		i=i+0.01;
+	}
+	bumpmap = bumpmapred + bumpmapgreen + bumpmapblue + bumpmapalpha;
+	
+	vec3 colormap;
+	vec3 colormapred;
+	vec3 clolormapgreen;
+	vec3 colormapblue;
+	vec3 colormapalpha;
+	
+	//bumpmap = (bumprangered > bumprangegreen? bumprangered:bumprangegreen);
+	
+	alphaaocolor = (texture(alphaAO,UV*alphares).rgb * alphamap ) * ((alpha_overlay.rgb + alpha_overlay.rgb + alpha_overlay.rgb + alpha_overlay.rgb) + alpha_overlay_color.rgb ) ;
+	//alphaaocolormultiplierfactor = (texture(alphaAO,UV*alphares).rgb * alphamap ) * ((alpha_overlay.rgb + alpha_overlay.rgb + alpha_overlay.rgb + alpha_overlay.rgb) );//+ alpha_overlay_color.rgb ) ;
+	alphacolor = texture(alphatex,UV *alphares).rgb * alphamap;
+	alphanormal = texture(alphanorm,UV *alphares).rgb *alphamap*alphaBumpValue;
+	alpharoughness = (( texture(alpharough,UV *alphares).rgb * alphamap * alphaRoughnessValue ) + alpha_roghness_overlay.rgb + alpha_roghness_overlay.rgb + alpha_roghness_overlay.rgb ) * alphamap ;
+	
+	//redaocolor = texture(redAO,UV*redres).rgb*(splatmapcolor.r-alphamap.rgb);
+	
+	vec3 sub_redcolor = texture(sub_red_tex,UV*sub_tex_res).rgb*sub_splatmap_color.r;
+	vec3 sub_greencolor = texture(sub_green_tex,UV*sub_tex_res).rgb*sub_splatmap_color.g;
+	vec3 sub_bluecolor = texture(sub_blue_tex,UV*sub_tex_res).rgb*sub_splatmap_color.b;
+	vec3 sub_color = sub_redcolor+sub_greencolor+sub_bluecolor;
+	
+	vec3 sub_rednorm = texture(sub_red_norm,UV*sub_tex_res).rgb * sub_splatmap_color.r;
+	vec3 sub_greennorm = texture(sub_green_norm,UV*sub_tex_res).rgb * sub_splatmap_color.g;
+	vec3 sub_bluenorm = texture(sub_blue_norm,UV*sub_tex_res).rgb * sub_splatmap_color.b;
+	vec3 sub_norm = (sub_rednorm+sub_greennorm+sub_bluenorm) * sub_bump ;
+	
+	redaocolor = texture(redAO,UV*redres).rgb*(splatmapcolor.r-alphamap.rgb) *vec3(0.7,0.7,0.7);
+	redcolor = (texture(redtex,UV*redres).rgb + sub_color) *(splatmapcolor.r-alphamap.rgb);
+	rednormal = (texture(rednorm,UV*redres).rgb + sub_norm) *(splatmapcolor.r-alphamap.rgb) * redBumpValue * bumpmap;
+	redroughness = texture(redrough,UV*redres).rgb *(splatmapcolor.r-alphamap.rgb) *redRoughnessValue ;
+	
+	greenaocolor = texture(greenAO,UV*greenres).rgb*(splatmapcolor.g);
+	greencolor = texture(greentex,UV*greenres).rgb *(splatmapcolor.g);
+	greennormal = texture(greennorm,UV*greenres).rgb *(splatmapcolor.g-alphamap.rgb) * greenBumpValue * bumpmap;
+	greenroughness = texture(greenrough,UV*greenres).rgb *(splatmapcolor.g) *greenRoughnessValue ;
+	
+	blueaocolor = texture(blueAO,UV*blueres).rgb * (splatmapcolor.b-alphamap.rgb);
+	bluecolor = texture(bluetex,UV*blueres).rgb *(splatmapcolor.b);
+	bluenormal = texture(bluenorm,UV*blueres).rgb *(splatmapcolor.b) * blueBumpValue * bumpmap;
+	blueroughness = texture(bluerough,UV*blueres).rgb *(splatmapcolor.b) *blueRoughnessValue ;
+	
+	//alphacolor = texture(alpha,UV*alphares).rgb *splatmapcolor.a;
+
+	//vec3 alphaalbedo = alphaaocolor.rgb;
+	
+	AO = dot( (redaocolor ) + greenaocolor + blueaocolor + alphaaocolor, vec3(1,1,1)) *AmbiontOccolution;
+	AO_LIGHT_AFFECT = dot(redaocolor+greenaocolor+blueaocolor+(alphaaocolor * AmbiontOccolutionLight),vec3(1,1,1)) * AOLEvalue;
+	
+	//ALBEDO = ( ((redcolor * redaocolor) * vec3(5,5,5)) + ((greencolor * greenaocolor) * vec3(5,5,5)) + ((bluecolor * blueaocolor) * vec3(5,5,5)) + (alphacolor * alphaaocolormultiplierfactor) ) ;
+	ALBEDO = (redcolor + greencolor + bluecolor) + (alphacolor*vec3(0.4,0.4,0.4)) ;
+	//vec3 redsplatmap = texture (splatmap,UV).rgb * splatmapcolor.r;
+	//ALBEDO = alphacolor;
+	
+	NORMAL = (rednormal+greennormal+bluenormal+alphanormal);
+	NORMALMAP = (rednormal+greennormal+bluenormal+alphanormal);
+	//NORMALMAP_DEPTH = dot(rednormal+greennormal+bluenormal+alphanormal,vec3(0.33333,0.33333,0.33333));
+	
+	//NORMALMAP_DEPTH = dot(rednormal+greennormal+bluenormal,vec3(1,1,1))*bumpvalue;
+	
+	//ROUGHNESS = dot(redroughness+greenroughness+blueroughness,vec3(0.7,0.7,0.7));
+	
+	//ROUGHNESS = dot(redroughness+greenroughness+blueroughness+alpharoughness,vec3(1,1,1));
+	ROUGHNESS = dot(redroughness+greenroughness+blueroughness,vec3(1,1,1)) ;
+	
+// Output:0
+
+}
+
+void light() {
+// Output:0
+
+}"
+
+[resource]
+shader = SubResource( 1 )
+shader_param/alpha_overlay = Color( 1, 1, 1, 1 )
+shader_param/alpha_roghness_overlay = Color( 1, 1, 1, 1 )
+shader_param/alpha_overlay_color = Color( 0.988235, 0.905882, 0.00784314, 1 )
+shader_param/redRoughnessValue = 0.523
+shader_param/greenRoughnessValue = 0.398
+shader_param/blueRoughnessValue = 0.297
+shader_param/alphaRoughnessValue = 1.0
+shader_param/redBumpValue = 1.0
+shader_param/greenBumpValue = 1.0
+shader_param/blueBumpValue = 1.0
+shader_param/alphaBumpValue = 1.0
+shader_param/AOLEvalue = 0.161
+shader_param/AmbiontOccolutionLight = 0.154
+shader_param/AmbiontOccolution = 1.0
+shader_param/redres = 70.0
+shader_param/greenres = 50.0
+shader_param/blueres = 50.0
+shader_param/alphares = 70.0
+shader_param/sub_tex_res = 70.0
+shader_param/sub_bump = null
+shader_param/splatmap = ExtResource( 1 )
+shader_param/sub_splatmap = ExtResource( 19 )
+shader_param/sub_red_tex = ExtResource( 18 )
+shader_param/sub_red_norm = ExtResource( 26 )
+shader_param/sub_green_tex = ExtResource( 17 )
+shader_param/sub_green_norm = ExtResource( 24 )
+shader_param/sub_blue_tex = ExtResource( 22 )
+shader_param/sub_blue_norm = ExtResource( 25 )
+shader_param/redAO = ExtResource( 20 )
+shader_param/redtex = ExtResource( 23 )
+shader_param/rednorm = ExtResource( 21 )
+shader_param/redrough = ExtResource( 27 )
+shader_param/redbump = ExtResource( 3 )
+shader_param/greenAO = ExtResource( 2 )
+shader_param/greentex = ExtResource( 5 )
+shader_param/greennorm = ExtResource( 4 )
+shader_param/greenrough = ExtResource( 7 )
+shader_param/greenbump = ExtResource( 6 )
+shader_param/bluetex = ExtResource( 9 )
+shader_param/bluenorm = ExtResource( 8 )
+shader_param/bluerough = ExtResource( 11 )
+shader_param/bluebump = ExtResource( 12 )
+shader_param/alphaAO = ExtResource( 10 )
+shader_param/alphatex = ExtResource( 13 )
+shader_param/alphanorm = ExtResource( 14 )
+shader_param/alpharough = ExtResource( 15 )
+shader_param/alphabump = ExtResource( 16 )
