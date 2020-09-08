@@ -46,31 +46,33 @@ uniform vec4 alpha_overlay : hint_color;
 uniform vec4 alpha_roghness_overlay : hint_color;
 uniform vec4 alpha_overlay_color : hint_color;
 
-uniform sampler2D redAO;
+uniform sampler2D redAO : hint_white;
 uniform sampler2D redtex : hint_albedo;
 uniform sampler2D rednorm : hint_normal;
 uniform sampler2D redrough ;
 uniform sampler2D redbump;
 
-uniform sampler2D greenAO;
+uniform sampler2D greenAO : hint_white;
 uniform sampler2D greentex : hint_albedo;
 uniform sampler2D greennorm : hint_normal;
 uniform sampler2D greenrough;
 uniform sampler2D greenbump;
 
-uniform sampler2D blueAO;
+uniform sampler2D blueAO : hint_white;
 uniform sampler2D bluetex : hint_albedo;
 uniform sampler2D bluenorm : hint_normal;
 uniform sampler2D bluerough;
 uniform sampler2D bluebump;
 
-uniform sampler2D alphaAO;
+uniform sampler2D alphaAO : hint_white;
 uniform sampler2D alphatex : hint_albedo;
 uniform sampler2D alphanorm : hint_normal;
 uniform sampler2D alpharough;
 uniform sampler2D alphabump;
 
 //uniform sampler2D alpha : hint_albedo;
+
+uniform float normalmapdepth : hint_range(-16,16);
 
 uniform float redRoughnessValue : hint_range(0,1);
 uniform float greenRoughnessValue : hint_range(0,1);
@@ -82,15 +84,22 @@ uniform float greenBumpValue : hint_range(0,1);
 uniform float blueBumpValue : hint_range(0,1);
 uniform float alphaBumpValue : hint_range(0,1);
 
-uniform float AOLEvalue : hint_range(0,1);
-uniform float AmbiontOccolutionLight : hint_range(0,1);
+//uniform float AOLEvalue : hint_range(0,1);
+//uniform float AmbiontOccolutionLight : hint_range(0,1);
 uniform float AmbiontOccolution : hint_range(0,1);
+
+uniform float alphaintensity : hint_range(0,5);
+uniform float redintensity : hint_range(0,5);
+uniform float greenintensity : hint_range(0,5);
+uniform float blueintensity : hint_range(0,5);
+
 uniform float redres = 1;
 uniform float greenres = 1;
 uniform float blueres = 1;
 uniform float alphares = 1;
 uniform float sub_tex_res = 1;
 uniform float sub_bump : hint_range(0,1);
+
 //uniform float alphares = 1;
 
 void vertex() {
@@ -181,10 +190,10 @@ void fragment() {
 	
 	//bumpmap = (bumprangered > bumprangegreen? bumprangered:bumprangegreen);
 	
-	alphaaocolor = (texture(alphaAO,UV*alphares).rgb * alphamap ) * ((alpha_overlay.rgb + alpha_overlay.rgb + alpha_overlay.rgb + alpha_overlay.rgb) + alpha_overlay_color.rgb ) ;
+	alphaaocolor = (texture(alphaAO,UV*alphares).rgb * alphamap ) * (alpha_overlay.rgb  + alpha_overlay_color.rgb ) ;
 	//alphaaocolormultiplierfactor = (texture(alphaAO,UV*alphares).rgb * alphamap ) * ((alpha_overlay.rgb + alpha_overlay.rgb + alpha_overlay.rgb + alpha_overlay.rgb) );//+ alpha_overlay_color.rgb ) ;
 	alphacolor = texture(alphatex,UV *alphares).rgb * alphamap;
-	alphanormal = texture(alphanorm,UV *alphares).rgb *alphamap*alphaBumpValue;
+	alphanormal = texture(alphanorm,UV *alphares).rgb *alphamap*alphaBumpValue ;
 	alpharoughness = (( texture(alpharough,UV *alphares).rgb * alphamap * alphaRoughnessValue ) + alpha_roghness_overlay.rgb + alpha_roghness_overlay.rgb + alpha_roghness_overlay.rgb ) * alphamap ;
 	
 	//redaocolor = texture(redAO,UV*redres).rgb*(splatmapcolor.r-alphamap.rgb);
@@ -204,31 +213,31 @@ void fragment() {
 	rednormal = (texture(rednorm,UV*redres).rgb + sub_norm) *(splatmapcolor.r-alphamap.rgb) * redBumpValue * bumpmap;
 	redroughness = texture(redrough,UV*redres).rgb *(splatmapcolor.r-alphamap.rgb) *redRoughnessValue ;
 	
-	greenaocolor = texture(greenAO,UV*greenres).rgb*(splatmapcolor.g);
-	greencolor = texture(greentex,UV*greenres).rgb *(splatmapcolor.g);
+	greenaocolor = texture(greenAO,UV*greenres).rgb*(splatmapcolor.g-alphamap.rgb);
+	greencolor = texture(greentex,UV*greenres).rgb *(splatmapcolor.g-alphamap.rgb);
 	greennormal = texture(greennorm,UV*greenres).rgb *(splatmapcolor.g-alphamap.rgb) * greenBumpValue * bumpmap;
-	greenroughness = texture(greenrough,UV*greenres).rgb *(splatmapcolor.g) *greenRoughnessValue ;
+	greenroughness = texture(greenrough,UV*greenres).rgb *(splatmapcolor.g-alphamap.rgb) *greenRoughnessValue ;
 	
 	blueaocolor = texture(blueAO,UV*blueres).rgb * (splatmapcolor.b-alphamap.rgb);
-	bluecolor = texture(bluetex,UV*blueres).rgb *(splatmapcolor.b);
-	bluenormal = texture(bluenorm,UV*blueres).rgb *(splatmapcolor.b) * blueBumpValue * bumpmap;
-	blueroughness = texture(bluerough,UV*blueres).rgb *(splatmapcolor.b) *blueRoughnessValue ;
+	bluecolor = texture(bluetex,UV*blueres).rgb *(splatmapcolor.b-alphamap.rgb);
+	bluenormal = texture(bluenorm,UV*blueres).rgb *(splatmapcolor.b-alphamap.rgb) * blueBumpValue * bumpmap;
+	blueroughness = texture(bluerough,UV*blueres).rgb *(splatmapcolor.b-alphamap.rgb) *blueRoughnessValue ;
 	
 	//alphacolor = texture(alpha,UV*alphares).rgb *splatmapcolor.a;
 
 	//vec3 alphaalbedo = alphaaocolor.rgb;
 	
-	AO = dot( (redaocolor ) + greenaocolor + blueaocolor + alphaaocolor, vec3(1,1,1)) *AmbiontOccolution;
-	AO_LIGHT_AFFECT = dot(redaocolor+greenaocolor+blueaocolor+(alphaaocolor * AmbiontOccolutionLight),vec3(1,1,1)) * AOLEvalue;
+	AO = dot( redaocolor + greenaocolor + blueaocolor + alphaaocolor, vec3(1,1,1)) *AmbiontOccolution;
+	//AO_LIGHT_AFFECT = dot(redaocolor+greenaocolor+blueaocolor+(alphaaocolor * AmbiontOccolutionLight),vec3(1,1,1)) * AOLEvalue;
 	
 	//ALBEDO = ( ((redcolor * redaocolor) * vec3(5,5,5)) + ((greencolor * greenaocolor) * vec3(5,5,5)) + ((bluecolor * blueaocolor) * vec3(5,5,5)) + (alphacolor * alphaaocolormultiplierfactor) ) ;
-	ALBEDO = (redcolor + greencolor + bluecolor) + (alphacolor*vec3(0.4,0.4,0.4)) ;
+	ALBEDO = clamp((redcolor * redintensity) + (greencolor * greenintensity) + (bluecolor * blueintensity),0.0,1.0) + (alphacolor* alphaintensity) ;
 	//vec3 redsplatmap = texture (splatmap,UV).rgb * splatmapcolor.r;
 	//ALBEDO = alphacolor;
 	
-	NORMAL = (rednormal+greennormal+bluenormal+alphanormal);
-	NORMALMAP = (rednormal+greennormal+bluenormal+alphanormal);
-	//NORMALMAP_DEPTH = dot(rednormal+greennormal+bluenormal+alphanormal,vec3(0.33333,0.33333,0.33333));
+	NORMAL = clamp(rednormal+greennormal+bluenormal+alphanormal,0.0,1.0);
+	NORMALMAP = clamp(rednormal+greennormal+bluenormal+alphanormal,0.0,1.0);
+	NORMALMAP_DEPTH = normalmapdepth;
 	
 	//NORMALMAP_DEPTH = dot(rednormal+greennormal+bluenormal,vec3(1,1,1))*bumpvalue;
 	
@@ -250,24 +259,27 @@ void light() {
 shader = SubResource( 1 )
 shader_param/alpha_overlay = Color( 1, 1, 1, 1 )
 shader_param/alpha_roghness_overlay = Color( 1, 1, 1, 1 )
-shader_param/alpha_overlay_color = Color( 0.988235, 0.905882, 0.00784314, 1 )
-shader_param/redRoughnessValue = 0.523
+shader_param/alpha_overlay_color = Color( 0, 0, 0, 1 )
+shader_param/normalmapdepth = 3.0
+shader_param/redRoughnessValue = 0.318
 shader_param/greenRoughnessValue = 0.398
 shader_param/blueRoughnessValue = 0.297
 shader_param/alphaRoughnessValue = 1.0
-shader_param/redBumpValue = 1.0
+shader_param/redBumpValue = 6.957
 shader_param/greenBumpValue = 1.0
 shader_param/blueBumpValue = 1.0
 shader_param/alphaBumpValue = 1.0
-shader_param/AOLEvalue = 0.161
-shader_param/AmbiontOccolutionLight = 0.154
 shader_param/AmbiontOccolution = 1.0
+shader_param/alphaintensity = 2.0
+shader_param/redintensity = 1.0
+shader_param/greenintensity = 0.1
+shader_param/blueintensity = 0.1
 shader_param/redres = 70.0
 shader_param/greenres = 50.0
 shader_param/blueres = 50.0
 shader_param/alphares = 70.0
 shader_param/sub_tex_res = 70.0
-shader_param/sub_bump = null
+shader_param/sub_bump = 1.0
 shader_param/splatmap = ExtResource( 1 )
 shader_param/sub_splatmap = ExtResource( 19 )
 shader_param/sub_red_tex = ExtResource( 18 )
